@@ -31,6 +31,7 @@
   <script>
     const signedDomainToken = "eyJzaWduZWQiOiJJaHQ2XC9qdTRUWk15dTljNUhNbWNmekM2QWFmdXFIbGlqOFNcL1ZNNGJxOFVERXZ2czBwc3gwZUZQNEdWSkVWNmVFU2FMaGV1UERNMnEwOVVhUFRLODFJbVpVYnBpTndMXC9wNENcL2R2RWRkanlQK[...]
     const gamesdkUrlPattern = /api\.cdnwave\.com\/sdkdom\/gamesdk/i;
+    const lockWarningPattern = /escape road 3\s+(?:is\s+)?locked(?:\.|…)?/i;
 
     function encodeBase64(value) {
       return btoa(unescape(encodeURIComponent(value)));
@@ -44,44 +45,49 @@
       }
     }
 
-    const signedDomainData = decodeBase64Json(signedDomainToken) || {};
-    const verifiedSignature = signedDomainData.signed || "";
-    const allowedHosts = [
-      location.hostname,
-      "staticquasar931.github.io",
-      "gamea.azgame.io",
-      "games.azgame.io",
-      "azgame.io"
-    ];
+    function buildUnlockedGameInfoObject() {
+      const signedDomainData = decodeBase64Json(signedDomainToken) || {};
+      const verifiedSignature = signedDomainData.signed || "";
+      const allowedHosts = [
+        location.hostname,
+        "staticquasar931.github.io",
+        "gamea.azgame.io",
+        "games.azgame.io",
+        "azgame.io"
+      ];
 
-    const unityGameInfoObject = {
-      allowPlay: true,
-      allow_play: true,
-      locked: false,
-      block: false,
-      blocked: false,
-      hosted: true,
-      sdkType: "gm",
-      sdk_type: "gm",
-      gameId: "escape-road-3",
-      gameName: "Escape Road 3",
-      gdGameKey: "escape-road-3-az",
-      gd_game_key: "escape-road-3-az",
-      moreGamesUrl: "",
-      more_games_url: "",
-      promotion: [],
-      promotions: [],
-      veryfiedDomainData: {
+      return {
+        allowPlay: true,
+        allow_play: true,
+        locked: false,
+        lock: false,
+        block: false,
+        blocked: false,
+        hosted: true,
+        sdkType: "gm",
+        sdk_type: "gm",
+        gameId: "escape-road-3",
+        gameName: "Escape Road 3",
+        gdGameKey: "escape-road-3-az",
+        gd_game_key: "escape-road-3-az",
+        moreGamesUrl: "",
+        more_games_url: "",
+        promotion: [],
+        promotions: [],
+        veryfiedDomainData: {
+          whiteListDomain: allowedHosts,
+          veryfiedSignature: verifiedSignature,
+          domain: location.hostname,
+          host: location.hostname
+        },
         whiteListDomain: allowedHosts,
         veryfiedSignature: verifiedSignature,
         domain: location.hostname,
         host: location.hostname
-      },
-      whiteListDomain: allowedHosts,
-      veryfiedSignature: verifiedSignature,
-      domain: location.hostname,
-      host: location.hostname
-    };
+      };
+    }
+
+    const unityGameInfoObject = buildUnlockedGameInfoObject();
 
     const unityAdInfoObject = {
       adsEnabled: false,
@@ -95,53 +101,101 @@
     const unityGameInfoParam = encodeBase64(JSON.stringify(unityGameInfoObject));
     const unityAdInfoParam = encodeBase64(JSON.stringify(unityAdInfoObject));
 
-    const unlockedGameInfoResponse = {
-      success: true,
-      status: "success",
-      message: "ok",
-      error: null,
-      sdk_type: "gm",
-      sdkName: "gm",
-      sdkVersion: "latest",
-      allow_play: true,
-      allow: true,
-      allowPlay: true,
-      block: false,
-      blocked: false,
-      locked: false,
-      hosted: true,
-      game: "escape-road-3",
-      gameid: "escape-road-3",
-      gameId: "escape-road-3",
-      gameName: "Escape Road 3",
-      gd_game_key: "escape-road-3-az",
-      more_games_url: "",
-      domains: [],
-      hosts: allowedHosts,
-      allowedHost: location.hostname,
-      allowedHosts: allowedHosts,
-      sitelockVersion: 2,
-      allowLocalHost: true,
-      allowCollectionPI: false,
-      version: "26040702",
-      title: "Escape Road 3",
-      messageStr: "ok",
-      errorReason: "",
-      gameInfoParam: unityGameInfoParam,
-      adParam: unityAdInfoParam,
-      data: unityGameInfoParam,
-      game_info: unityGameInfoParam,
-      ad_info: unityAdInfoParam,
-      config: unityGameInfoObject,
-      gameInfo: unityGameInfoObject,
-      result: {
+    function buildUnlockedGameInfoResponse() {
+      return {
         success: true,
+        status: "success",
+        message: "ok",
+        error: null,
+        sdk_type: "gm",
+        sdkName: "gm",
+        sdkVersion: "latest",
+        allow_play: true,
+        allow: true,
+        allowPlay: true,
+        block: false,
+        blocked: false,
+        lock: false,
+        locked: false,
+        hosted: true,
+        game: "escape-road-3",
+        gameid: "escape-road-3",
+        gameId: "escape-road-3",
+        gameName: "Escape Road 3",
+        gd_game_key: "escape-road-3-az",
+        more_games_url: "",
+        domains: [],
+        hosts: [location.hostname, "staticquasar931.github.io", "gamea.azgame.io", "games.azgame.io", "azgame.io"],
+        allowedHost: location.hostname,
+        allowedHosts: [location.hostname, "staticquasar931.github.io", "gamea.azgame.io", "games.azgame.io", "azgame.io"],
+        sitelockVersion: 2,
+        allowLocalHost: true,
+        allowCollectionPI: false,
+        version: "26040702",
+        title: "Escape Road 3",
+        messageStr: "ok",
+        errorReason: "",
+        gameInfoParam: unityGameInfoParam,
+        adParam: unityAdInfoParam,
         data: unityGameInfoParam,
-        adData: unityAdInfoParam
-      }
-    };
+        game_info: unityGameInfoParam,
+        ad_info: unityAdInfoParam,
+        config: unityGameInfoObject,
+        gameInfo: unityGameInfoObject,
+        result: {
+          success: true,
+          data: unityGameInfoParam,
+          adData: unityAdInfoParam
+        }
+      };
+    }
+
+    const unlockedGameInfoResponse = buildUnlockedGameInfoResponse();
+
+    function ensureUnlockedGameState() {
+      Object.assign(unityGameInfoObject, {
+        allowPlay: true,
+        allow_play: true,
+        locked: false,
+        lock: false,
+        block: false,
+        blocked: false,
+        hosted: true,
+        sdkType: "gm",
+        sdk_type: "gm"
+      });
+
+      Object.assign(unlockedGameInfoResponse, {
+        success: true,
+        status: "success",
+        message: "ok",
+        allow_play: true,
+        allow: true,
+        allowPlay: true,
+        block: false,
+        blocked: false,
+        lock: false,
+        locked: false,
+        hosted: true,
+        messageStr: "ok",
+        errorReason: "",
+        gameInfoParam: unityGameInfoParam,
+        adParam: unityAdInfoParam,
+        data: unityGameInfoParam,
+        game_info: unityGameInfoParam,
+        ad_info: unityAdInfoParam,
+        config: unityGameInfoObject,
+        gameInfo: unityGameInfoObject,
+        result: {
+          success: true,
+          data: unityGameInfoParam,
+          adData: unityAdInfoParam
+        }
+      });
+    }
 
     function makeGamesdkResponseBody() {
+      ensureUnlockedGameState();
       return JSON.stringify(unlockedGameInfoResponse);
     }
 
@@ -158,6 +212,43 @@
       });
     }
 
+    const nativeStorageGetItem = Storage.prototype.getItem;
+    const nativeStorageSetItem = Storage.prototype.setItem;
+
+    Storage.prototype.getItem = function(key) {
+      const storageKey = String(key);
+      if (storageKey === "gm_game_info" || storageKey === "gameInfoResponse") {
+        return makeGamesdkResponseBody();
+      }
+      if (storageKey === "gm_game_info_param") {
+        return unityGameInfoParam;
+      }
+      if (storageKey === "gm_ad_info_param") {
+        return unityAdInfoParam;
+      }
+      if (storageKey === "gmsdksigndomain") {
+        return signedDomainToken;
+      }
+      return nativeStorageGetItem.call(this, storageKey);
+    };
+
+    Storage.prototype.setItem = function(key, value) {
+      const storageKey = String(key);
+      if (storageKey === "gm_game_info" || storageKey === "gameInfoResponse") {
+        return;
+      }
+      if (storageKey === "gm_game_info_param") {
+        return;
+      }
+      if (storageKey === "gm_ad_info_param") {
+        return;
+      }
+      if (storageKey === "gmsdksigndomain") {
+        return;
+      }
+      return nativeStorageSetItem.call(this, storageKey, value);
+    };
+
     try {
       localStorage.setItem("gmsdksigndomain", signedDomainToken);
       localStorage.setItem("gm_game_info", makeGamesdkResponseBody());
@@ -171,11 +262,13 @@
     function firebaseSetUserProperties() {}
     function gmEvent() {}
     function gmStartGame(callbackFunction) {
+      ensureUnlockedGameState();
       if (typeof callbackFunction === "function") {
         callbackFunction();
       }
     }
     function gmStartAds(callbackFunction) {
+      ensureUnlockedGameState();
       if (typeof callbackFunction === "function") {
         callbackFunction();
       }
@@ -191,9 +284,11 @@
     window.SetSDKType = window.SetSDKType || SetSDKType;
     window.GMSOFT_SDKTYPE = "gm";
     window.sdkType = "gm";
+    window.__escapeRoadUnlocked = true;
 
     window.GMGameSDK = window.GMGameSDK || {
       init: function() {
+        ensureUnlockedGameState();
         return {
           setVersion: function() {
             return this;
@@ -207,11 +302,13 @@
     window.GMSDK = window.GMSDK || {};
     window.GMSDK.SetSDKType = window.GMSDK.SetSDKType || SetSDKType;
     window.GMSDK.SetGameInfoParam = window.GMSDK.SetGameInfoParam || function() {
+      ensureUnlockedGameState();
       return unityGameInfoParam;
     };
 
     window.GMAdvertisementManager = window.GMAdvertisementManager || {};
     window.GMAdvertisementManager.SetAdParam = window.GMAdvertisementManager.SetAdParam || function() {
+      ensureUnlockedGameState();
       return unityAdInfoParam;
     };
 
@@ -224,6 +321,7 @@
       window.fetch = function(resource, init) {
         const url = typeof resource === "string" ? resource : resource && resource.url;
         if (isGamesdkUrl(url)) {
+          ensureUnlockedGameState();
           return Promise.resolve(createGamesdkResponse());
         }
         return nativeFetch(resource, init).then(function(response) {
@@ -245,6 +343,7 @@
         if (!this.__codexGamesdkIntercept) {
           return nativeOpen.apply(this, arguments);
         }
+        ensureUnlockedGameState();
         this.readyState = 1;
         if (typeof this.onreadystatechange === "function") {
           this.onreadystatechange();
@@ -263,6 +362,7 @@
           return nativeSend.apply(this, arguments);
         }
 
+        ensureUnlockedGameState();
         const payload = makeGamesdkResponseBody();
         Object.defineProperty(this, "readyState", { configurable: true, value: 4 });
         Object.defineProperty(this, "status", { configurable: true, value: 200 });
@@ -363,7 +463,6 @@
     }
 
     function removeLockOverlay() {
-      const lockPattern = /escape road 3\s+is\s+locked(?:\.|…)?/i;
       const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_ELEMENT);
       let node;
       while ((node = walker.nextNode())) {
@@ -371,7 +470,7 @@
           continue;
         }
         const text = (node.textContent || "").replace(/\s+/g, " ").trim();
-        if (!text || !lockPattern.test(text)) {
+        if (!text || !lockWarningPattern.test(text)) {
           continue;
         }
         node.style.display = "none";
@@ -491,6 +590,7 @@
     if (location.protocol === "file:") {
       setFatalError("This build must be served from a local web server. Opening index.html directly with file:// will not work for Unity WebGL.");
     } else {
+      ensureUnlockedGameState();
       observeLockOverlay();
       bootGame();
     }
